@@ -1,9 +1,12 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
 import ContributionList from '../components/ContributionList';
 import axios from 'axios';
 import moment from 'moment';
 import filestack from 'filestack-js';
+import { getEventContent } from '../actions/index';
 const client = filestack.init('A03mnfU7QQ6QY8rPMGtfBz');
 
 class Event extends React.Component {
@@ -11,14 +14,11 @@ class Event extends React.Component {
     super(props);
     this.state = {
       eventId: props.match.params.id,
-      title: '',
       contributionList: [],
       contributionText: '',
       contributionType: '',
       contributionMediaUrl: '',
       hasPermissionToView: null,
-      deliveryTime: '',
-      recipient: {},
       curSecond: moment().second(),
       curMinute: moment().minute(),
       curHour: moment().hour()
@@ -27,9 +27,6 @@ class Event extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.updateContributions = this.updateContributions.bind(this);
     this.showPicker = this.showPicker.bind(this);
-  }
-
-  componentWillMount () {
     this.checkIfContributor();
   }
 
@@ -69,7 +66,7 @@ class Event extends React.Component {
         this.setState({
           hasPermissionToView: userEventIds.includes(Number(this.state.eventId))
         });
-        this.getEventContent();
+        this.props.getEventContent(this.state.eventId);
       })
       .catch(err => console.error(err));
   }
@@ -82,17 +79,6 @@ class Event extends React.Component {
       .catch(error => {
         console.log('Error in updateContributions query', error);
       });
-  }
-
-  getEventContent () {
-    axios.get(`/api/events/${this.state.eventId}`)
-    .then(({ data: { title, delivery_time: deliveryTime, recipient} }) => {
-      this.setState({ title, deliveryTime, recipient });
-      this.updateContributions();
-    })
-    .catch(error => {
-      console.log('Error in Event data query', error);
-    });
   }
 
   showPicker(event) {
@@ -112,14 +98,13 @@ class Event extends React.Component {
       return <div></div>;
     }
 
-    if (this.state.hasPermissionToView) {
+    if (this.state.hasPermissionToView && this.props.content.recipient) {
       const { id } = this.props.match.params;
-      const { title, description, deliveryTime } = this.state;
-
-      let launchTimeDisplay = moment(deliveryTime).format('MMM Do YYYY || hh : mm');
-      let timeOfDay = moment(deliveryTime).format('a');
+      console.log(this.props.content);
+      let launchTimeDisplay = moment(this.props.content.delivery_time).format('MMM Do YYYY || hh : mm');
+      let timeOfDay = moment(this.props.content.delivery_time).format('a');
       let launchDisplay = launchTimeDisplay + ' ' + timeOfDay;
-      let timeToLaunch = moment().to(deliveryTime);
+      let timeToLaunch = moment().to(this.props.content.delivery_time);
       let happen = timeToLaunch.includes('ago') ? 'Happened' : 'Happening';
 
       const uploadConfirmation = this.state.contributionType
@@ -135,8 +120,8 @@ class Event extends React.Component {
       return (
         <div className="row justify-content-center">
           <div className="col col-md-8 text-center">
-            <h1>{title}</h1>
-            <h4>A PepClock Lovingly Created for {this.state.recipient.first_name} {this.state.recipient.last_name}</h4>
+            <h1>{this.props.content.title}</h1>
+            <h4>A PepClock Lovingly Created for {this.props.content.recipient.first_name}</h4>
             <h5 className="text-muted">{happen} {timeToLaunch}</h5>
             <h6 className="text-muted">on {launchDisplay}</h6>
             <Link className="btn btn-outline-info" to={`/edit/${id}`}>Edit event</Link>
@@ -159,7 +144,7 @@ class Event extends React.Component {
             </form>
           </div>
         </div>
-    );
+      );
     }
 
     return (
@@ -173,4 +158,12 @@ class Event extends React.Component {
   }
 }
 
-export default Event;
+const mapDispatchToProps = function(dispatch) {
+  return bindActionCreators({ getEventContent }, dispatch);
+};
+
+const mapStateToProps = function({ content }) {
+  return { content };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Event);

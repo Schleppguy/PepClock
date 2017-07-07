@@ -1,16 +1,12 @@
-// import axios from 'axios';
-// const API_KEY = 'c5551cc4c403b112912fa6e225ea20bc';
-// const ROOT_URL = `http://api.openweathermap.org/data/2.5/forecast?appid=${API_KEY}&`;
-// export const FETCH_WEATHER = 'FETCH_WEATHER';
+import axios from 'axios';
+export const GET_EVENT_CONTENT = 'GET_EVENT_CONTENT';
 
-// export function fetchWeather(city) {
-//   const url = `${ROOT_URL}q=${city},us`;
-//   const request = axios.get(url);
+export const getEventContent = function(eventId) {
+  const request = axios.get(`/api/events/${eventId}`);
 
-  
-//   return {
-//     type: FETCH_WEATHER,
-//     payload: request
-//   };
-// }
+  return {
+    type: GET_EVENT_CONTENT,
+    payload: request
+  };
 
+};
