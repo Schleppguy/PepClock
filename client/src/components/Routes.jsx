@@ -11,13 +11,13 @@ import {
 
 import Home from './Home';
 import Dashboard from './Dashboard';
-import Event from './Event';
+import Event from '../containers/Event';
 import Create from './Create';
 import Redirected from './Redirected';
 import PrivateRoute from './PrivateRoute';
 import Nav from './Nav';
 import Edit from './Edit';
-import RunWorkers from './RunWorkers'
+import RunWorkers from './RunWorkers';
 
 const Routes = () => (
   <div>

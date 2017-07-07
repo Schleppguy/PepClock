@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ContributionList from './ContributionList';
+import ContributionList from '../components/ContributionList';
 import axios from 'axios';
 import moment from 'moment';
 import filestack from 'filestack-js';
@@ -132,7 +132,7 @@ class Event extends React.Component {
           )
         : null;
 
-    return (
+      return (
         <div className="row justify-content-center">
           <div className="col col-md-8 text-center">
             <h1>{title}</h1>
@@ -153,13 +153,13 @@ class Event extends React.Component {
                 value={this.state.contributionText}
                 placeholder="Enter your message">
               </textarea>
-              <a className="btn btn-success" href="#" onClick={this.showPicker} style={{margin:'5px'}}>
+              <a className="btn btn-success" href="#" onClick={this.showPicker} style={{margin: '5px'}}>
                 <i className="fa fa-picture-o" style={{cursor: 'pointer', color: 'white'}} /> Photo/Video</a>
-              <button className="btn btn-primary" style={{margin:'5px'}}>Create Post</button>
+              <button className="btn btn-primary" style={{margin: '5px'}}>Create Post</button>
             </form>
           </div>
         </div>
-      );
+    );
     }
 
     return (
