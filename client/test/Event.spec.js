@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import Event from '../src/components/Event';
+import Event from '../src/containers/Event';
 
 describe('Event Component', function() {
   // Set this.props URL params manually
@@ -21,6 +21,6 @@ describe('Event Component', function() {
 
   it('contains a form where the user can add a contribution', function() {
     wrapper.setState({ title: 'Pool Party', hasPermissionToView: true });
-    expect(wrapper.contains(<button className="btn btn-primary" style={{margin:'5px'}}>Create Post</button>)).to.equal(true);
+    expect(wrapper.contains(<button className="btn btn-primary" style={{margin: '5px'}}>Create Post</button>)).to.equal(true);
   });
 });

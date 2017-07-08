@@ -6,7 +6,7 @@ import ContributionList from '../components/ContributionList';
 import axios from 'axios';
 import moment from 'moment';
 import filestack from 'filestack-js';
-import { getEventContent } from '../actions/index';
+import { getEventContent, updateContributions } from '../actions/index';
 const client = filestack.init('A03mnfU7QQ6QY8rPMGtfBz');
 
 class Event extends React.Component {
@@ -14,7 +14,6 @@ class Event extends React.Component {
     super(props);
     this.state = {
       eventId: props.match.params.id,
-      contributionList: [],
       contributionText: '',
       contributionType: '',
       contributionMediaUrl: '',
@@ -25,7 +24,6 @@ class Event extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.updateContributions = this.updateContributions.bind(this);
     this.showPicker = this.showPicker.bind(this);
     this.checkIfContributor();
   }
@@ -52,7 +50,7 @@ class Event extends React.Component {
         contributionType: '',
         contributionMediaUrl: ''
       });
-      this.updateContributions();
+      this.props.updateContributions(this.state.eventId);
     })
     .catch(err => {
       console.log('Error in Event.jsx', err);
@@ -67,18 +65,9 @@ class Event extends React.Component {
           hasPermissionToView: userEventIds.includes(Number(this.state.eventId))
         });
         this.props.getEventContent(this.state.eventId);
+        this.props.updateContributions(this.state.eventId);
       })
       .catch(err => console.error(err));
-  }
-
-  updateContributions() {
-    axios.get(`/api/contributions/events/${this.state.eventId}`)
-      .then(({ data: contributionList}) => {
-        this.setState({contributionList});
-      })
-      .catch(error => {
-        console.log('Error in updateContributions query', error);
-      });
   }
 
   showPicker(event) {
@@ -121,12 +110,12 @@ class Event extends React.Component {
         <div className="row justify-content-center">
           <div className="col col-md-8 text-center">
             <h1>{this.props.content.title}</h1>
-            <h4>A PepClock Lovingly Created for {this.props.content.recipient.first_name}</h4>
+            <h4>A PepClock Lovingly Created for {this.props.content.recipient.first_name} {this.props.content.recipient.last_name}</h4>
             <h5 className="text-muted">{happen} {timeToLaunch}</h5>
             <h6 className="text-muted">on {launchDisplay}</h6>
             <Link className="btn btn-outline-info" to={`/edit/${id}`}>Edit event</Link>
             <hr />
-            <ContributionList contributionList={this.state.contributionList}/>
+            <ContributionList contributionList={this.props.contributions}/>
             <hr />
             <form onSubmit={this.handleSubmit}>
 
@@ -159,11 +148,11 @@ class Event extends React.Component {
 }
 
 const mapDispatchToProps = function(dispatch) {
-  return bindActionCreators({ getEventContent }, dispatch);
+  return bindActionCreators({ getEventContent, updateContributions }, dispatch);
 };
 
-const mapStateToProps = function({ content }) {
-  return { content };
+const mapStateToProps = function({ content, contributions }) {
+  return { content, contributions };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Event);
